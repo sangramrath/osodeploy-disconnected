@@ -1,0 +1,44 @@
+# Create an OSEv3 group that contains the masters, nodes, and etcd groups
+[OSEv3:children]
+masters
+nodes
+etcd
+
+# Set variables common for all OSEv3 hosts
+[OSEv3:vars]
+# SSH user, this user should allow ssh based auth without requiring a password
+ansible_ssh_user=oso
+openshift_release=v3.9.0
+oreg_url=oso-repo-node:5000/openshift/origin-${component}:${version}
+openshift_examples_modify_imagestreams=true
+containerized=true
+system_images_registry=oso-repo-node:5000
+osm_etcd_image=rhel7/etcd
+openshift_disable_check=memory_availability
+openshift_docker_additional_registries=oso-repo-node:5000
+openshift_docker_insecure_registries=oso-repo-node:5000
+openshift_docker_blocked_registries=docker.io,registry.access.redhat.com
+# If ansible_ssh_user is not root, ansible_become must be set to true
+ansible_become=true
+
+openshift_deployment_type=origin
+
+# uncomment the following to enable htpasswd authentication; defaults to DenyAllPasswordIdentityProvider
+#openshift_master_identity_providers=[{'name': 'htpasswd_auth', 'login': 'true', 'challenge': 'true', 'kind': 'HTPasswdPasswordIdentityProvider', 'filename': '/etc/origin/master/htpasswd'}]
+
+# host group for masters
+[masters]
+oso-master
+
+# host group for etcd
+[etcd]
+oso-master
+
+# host group for nodes, includes region info
+[nodes]
+#oso-master
+#oso-node
+oso-node openshift_node_labels="{'region': 'primary', 'zone': 'east'}"
+#node2.example.com openshift_node_labels="{'region': 'primary', 'zone': 'west'}"
+oso-master openshift_node_labels="{'region': 'infra', 'zone': 'default'}"
+#infra-node2.example.com openshift_node_labels="{'region': 'infra', 'zone': 'default'}"
