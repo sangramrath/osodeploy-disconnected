@@ -1,0 +1,10 @@
+# Replace 10.0.2.4 with the private IP address of the bastion host / jump server
+# Make sure there is an images folder in the same folder as this docker-compose.yml file. If folder name is different change it here
+registry:
+      image: registry:latest
+      ports:
+        - 10.0.2.4:5000:5000
+      environment:
+        REGISTRY_STORAGE_FILESYSTEM_ROOTDIRECTORY: /Data
+      volumes:
+        - ./images:/Data
